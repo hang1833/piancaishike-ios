@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="light" data-scale="medium">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>偏財時刻｜正式版 v3.0</title>
+  <style>
+    .rank-header { display: block !important; }
+    .rank-score { display: block; text-align: left; white-space: normal; margin-top: 8px; }
+    .rank-time { display: block; margin-top: 8px; line-height: 1.2; }
+
+    body {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .result-card {
+        display: block !important;
+        padding: 16px !important;
+        border-radius: 20px !important;
+      }
+      .result-top {
+        display: block !important;
+      }
+      .time-slot {
+        font-size: 24px !important;
+        line-height: 1.15 !important;
+        font-weight: 800 !important;
+        margin-bottom: 8px !important;
+        word-break: break-word;
+      }
+      .rank-score {
+        display: inline-block !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 10px !important;
+      }
+      .subtext {
+        font-size: 16px !important;
+        line-height: 1.7 !important;
+      }
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    :root {
+      --font-display: "Noto Serif TC", "Source Han Serif TC", Georgia, serif;
+      --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 20px;
+      --text-xl: 28px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --radius-sm: 14px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --radius-full: 999px;
+      --bg: #f3efe8;
+      --surface: rgba(255, 251, 245, 0.92);
+      --surface-2: #faf6ef;
+      --surface-3: #efe7da;
+      --text: #29231d;
+      --muted: #7b7266;
+      --line: #ddd2c2;
+      --primary: #bd9136;
+      --primary-strong: #a27722;
+      --primary-soft: rgba(189, 145, 54, 0.16);
+      --accent: #173329;
+      --accent-soft: #1f3d31;
+      --success: #305a46;
+      --danger: #8e5a26;
+      --page-glow: radial-gradient(circle at 50% 6%, rgba(201, 163, 93, 0.18), transparent 45%);
+      --screen-bg: linear-gradient(180deg, #f4f0e9 0%, #efe9de 100%);
+      --tab-bg: #ebe3d7;
+      --shadow: 0 24px 60px rgba(53, 40, 23, 0.08);
+      --locked-mask: linear-gradient(180deg, rgba(255, 251, 245, 0.48), rgba(255, 251, 245, 0.95));
+    }
+
+    [data-theme="dark"] {
+      --bg: #081712;
+      --surface: rgba(18, 37, 30, 0.9);
+      --surface-2: #11261f;
+      --surface-3: #163027;
+      --text: #f0eadf;
+      --muted: #b4ab9a;
+      --line: #30483d;
+      --primary: #d4a84e;
+      --primary-strong: #b98b32;
+      --primary-soft: rgba(212, 168, 78, 0.18);
+      --accent: #0f241d;
+      --accent-soft: #173329;
+      --success: #9cc9ac;
+      --danger: #d3b482;
+      --page-glow: radial-gradient(circle at 50% 6%, rgba(203, 164, 79, 0.24), transparent 45%);
+      --screen-bg: linear-gradient(180deg, #081712 0%, #0c2019 100%);
+      --tab-bg: #20362b;
+      --shadow: 0 28px 72px rgba(0, 0, 0, 0.28);
+      --locked-mask: linear-gradient(180deg, rgba(8, 23, 18, 0.3), rgba(8, 23, 18, 0.92));
+    }
+
+    [data-scale="small"] {
+      --text-xs: 12px;
+      --text-sm: 13px;
+      --text-base: 15px;
+      --text-lg: 18px;
+      --text-xl: 25px;
+    }
+
+    [data-scale="medium"] {
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 20px;
+      --text-xl: 28px;
+    }
+
+    [data-scale="large"] {
+      --text-xs: 13px;
+      --text-sm: 15px;
+      --text-base: 18px;
+      --text-lg: 22px;
+      --text-xl: 31px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      background: var(--screen-bg);
+      color: var(--text);
+    }
+    button, input, select { font: inherit; }
+
+    .page {
+      min-height: 100vh;
+      padding: calc(20px + env(safe-area-inset-top)) 12px calc(34px + env(safe-area-inset-bottom));
+      background-image: var(--page-glow);
+    }
+    .phone {
+      max-width: 430px;
+      margin: 0 auto;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hero {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand-row, .row-between, .result-top, .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary);
+      font-size: var(--text-lg);
+      font-weight: 800;
+    }
+    .brand-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--primary);
+      color: #fffaf0;
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+    .soft-pill {
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: var(--text-xs);
+      font-weight: 700;
+    }
+    .headline {
+      margin: 18px 0 8px;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1.25;
+    }
+    .big-time {
+      margin: 8px 0 6px;
+      font-family: var(--font-display);
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.15;
+    }
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-base);
+    }
+    .section {
+      padding: 18px;
+    }
+    .segment {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 6px;
+      border-radius: var(--radius-full);
+      background: var(--tab-bg);
+      margin-bottom: 16px;
+    }
+    .segment button {
+      min-height: 42px;
+      border: 0;
+      border-radius: var(--radius-full);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .segment button.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    .notice {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-size: var(--text-sm);
+      color: var(--text);
+    }
+    .result-list, .plan-list, .setting-list, .form-stack, .detail-list, .seven-day-list {
+      display: grid;
+      gap: 14px;
+    }
+    .card, .result-card, .plan-card, .setting-card, .input-card, .detail-card {
+      position: relative;
+      padding: 18px;
+      border-radius: 24px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .result-card strong, .plan-card h3, .setting-card h3, .input-title, .detail-title {
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+    }
+    .time-slot {
+      font-size: calc(var(--text-lg) + 2px);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: var(--text-sm);
+      color: var(--primary);
+      font-weight: 800;
+    }
+    .subtext {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .meta-item {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .meta-item.full {
+      grid-column: 1 / -1;
+    }
+    .meta-item label {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .meta-item div {
+      font-size: var(--text-base);
+      font-weight: 800;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 380px) {
+      .input-grid, .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .field.full {
+      grid-column: 1 / -1;
+    }
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+    }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .primary-btn, .ghost-btn, .mini-btn {
+      min-height: 48px;
+      padding: 10px 18px;
+      border-radius: 18px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .primary-btn {
+      background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+      color: #fffaf1;
+      border-color: transparent;
+    }
+    .ghost-btn {
+      background: var(--surface);
+      color: var(--text);
+    }
+    .plan-card.featured {
+      border-color: var(--primary);
+      background: linear-gradient(180deg, var(--primary-soft), var(--surface-2));
+    }
+    .price {
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .plan-meta {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .chip {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .chip[disabled] {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+    .sheet {
+      position: fixed;
+      inset: auto 0 0 0;
+      display: none;
+      padding: 16px 14px 18px;
+      z-index: 50;
+    }
+    .sheet.active { display: block; }
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 15, 15, 0.42);
+      display: none;
+      z-index: 45;
+    }
+    .sheet-backdrop.active { display: block; }
+    .sheet-card, .picker-sheet-card {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 26px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .sheet-card h2, .picker-title {
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+    }
+    .sheet-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .sheet-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .toast-stack {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 28px;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .toast {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 2px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+    .toast strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: var(--text-base);
+    }
+    .toast div {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      white-space: pre-line;
+    }
+    .footnote {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      text-align: center;
+    }
+    .hidden-native {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    .picker-btn {
+      width: 100%;
+      min-height: 56px;
+      padding: 0 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .picker-btn::after {
+      content: '›';
+      font-size: 24px;
+      line-height: 1;
+      color: var(--muted);
+    }
+    .picker-btn.empty { color: var(--muted); }
+    .wheel-wrap {
+      position: relative;
+      margin-top: 14px;
+      height: 252px;
+      border-radius: 22px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .wheel-overlay {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: 50%;
+      height: 52px;
+      transform: translateY(-50%);
+      border-radius: 14px;
+      border: 1px solid var(--primary);
+      background: var(--primary-soft);
+      pointer-events: none;
+    }
+    .wheel-list {
+      position: relative;
+      height: 100%;
+      overflow-y: auto;
+      padding: 100px 12px;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+    }
+    .wheel-list::-webkit-scrollbar { display: none; }
+    .wheel-item {
+      height: 52px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: center;
+      font-size: 20px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .wheel-item.active {
+      color: var(--text);
+      font-weight: 800;
+    }
+    .picker-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .picker-actions button { flex: 1; }
+    .result-card.clickable { cursor: pointer; }
+    .result-card.selected-date {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+    .rank-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .rank-item {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .rank-no {
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .rank-time {
+      font-size: var(--text-lg);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .rank-score {
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    /* 底部善念小註明（高雅溫潤排版） */
+    .blessing-note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, var(--primary-soft), var(--surface-2));
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    .blessing-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xs);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .blessing-text {
+      margin: 0;
+      font-size: var(--text-xs);
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    /* 1.5 秒高貴黑金開場畫面（CSS + JS 雙重保證 1.5 秒準時優雅淡出） */
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(218, 180, 98, 0.24), rgba(20, 44, 37, 0.42) 36%, transparent 68%),
+        linear-gradient(180deg, #040b0e 0%, #071612 50%, #050a0f 100%);
+      color: #f0eadf;
+      text-align: center;
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: splashAutoHide 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.5s forwards;
+    }
+    @keyframes splashAutoHide {
+      to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+    .splash-screen.hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    .splash-inner {
+      padding: 24px;
+      width: min(92vw, 360px);
+      animation: splashRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes splashRise {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .splash-orbit {
+      position: relative;
+      width: min(64vw, 252px);
+      aspect-ratio: 1;
+      margin: 0 auto 24px;
+    }
+    .orbit-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 12px rgba(214, 173, 86, 0.42));
+    }
+    .orbit-path {
+      fill: none;
+      stroke: url(#goldStroke);
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-dasharray: 720;
+      stroke-dashoffset: 720;
+      animation: orbitDraw 1.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    }
+    .orbit-path-soft {
+      fill: none;
+      stroke: rgba(243, 231, 198, 0.65);
+      stroke-width: 2.6;
+      stroke-linecap: round;
+      stroke-dasharray: 180 540;
+      animation: softSweep 2.4s linear infinite;
+    }
+    @keyframes orbitDraw {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes softSweep {
+      to { stroke-dashoffset: -720; }
+    }
+    .splash-core {
+      position: absolute;
+      inset: 20.5%;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #1c3d33 0%, #112720 68%, #0b1a15 100%);
+      border: 1.5px solid rgba(242, 226, 188, 0.78);
+      box-shadow:
+        0 0 58px rgba(214, 176, 83, 0.28),
+        inset 0 0 22px rgba(214, 176, 83, 0.16);
+    }
+    .splash-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: #f8f0d4;
+      text-shadow: 0 2px 18px rgba(214, 176, 83, 0.28);
+    }
+    .splash-subtitle {
+      margin-top: 10px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      color: rgba(238, 230, 210, 0.86);
+    }
+    .splash-caption {
+      margin-top: 10px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      color: rgba(235, 224, 198, 0.82);
+    }
+  </style>
+</head>
+<body>
+<div class="splash-screen" id="splashScreen" aria-hidden="true">
+  <div class="splash-inner">
+    <div class="splash-orbit">
+      <svg class="orbit-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="goldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff8e3" />
+            <stop offset="38%" stop-color="#f3dc95" />
+            <stop offset="72%" stop-color="#d8b052" />
+            <stop offset="100%" stop-color="#f7efcf" />
+          </linearGradient>
+        </defs>
+        <path class="orbit-path" d="M43 146C50 77 112 34 173 45c25 5 39 17 31 33-9 18-23 12-17 28 8 21 10 40 2 61-12 33-45 53-84 49-46-4-77-33-72-70 1-12 5-24 11-35" />
+        <path class="orbit-path-soft" d="M34 153C45 84 106 31 171 42c32 5 48 22 39 42-6 14-21 13-18 26 6 22 8 46-3 68-13 28-43 51-86 47-55-5-87-44-79-88 2-14 8-27 15-37" />
+      </svg>
+      <div class="splash-core">
+        <svg viewBox="0 0 160 160" width="118" height="118" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fff8e4" />
+              <stop offset="42%" stop-color="#f2d886" />
+              <stop offset="76%" stop-color="#d5a848" />
+              <stop offset="100%" stop-color="#fff1c8" />
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#logoGold)" stroke-linecap="round">
+            <path d="M39 114A54 54 0 0 1 43 52" stroke-width="5.2" />
+            <path d="M48 114A46 46 0 0 1 51 58" stroke-width="3.6" />
+            <path d="M98 38a54 54 0 0 1 25 12 50 50 0 0 1 13 21" stroke-width="5.2" />
+            <path d="M96 48a45 45 0 0 1 22 10 42 42 0 0 1 10 16" stroke-width="3.6" />
+            <path d="M132 80c1 27-16 49-42 58" stroke-width="5.2" />
+            <path d="M123 82c0 22-12 40-32 48" stroke-width="3.6" />
+            <circle cx="80" cy="86" r="47" stroke-width="2.2" />
+          </g>
+          <g fill="url(#logoGold)">
+            <path d="M80 10l4.2 10.8 10.8 4.2-10.8 4.2L80 40l-4.2-10.8L65 25l10.8-4.2L80 10z" />
+            <path d="M56 67l3.8 7.4 7.4 3.8-7.4 3.8-3.8 7.4-3.8-7.4-7.4-3.8 7.4-3.8 3.8-7.4z" />
+            <circle cx="108" cy="88" r="3.5" />
+          </g>
+          <text x="80" y="105" text-anchor="middle" font-family="serif" font-size="74" font-weight="700" fill="url(#logoGold)">財</text>
+        </svg>
+      </div>
+    </div>
+    <div class="splash-title">偏財時刻</div>
+    <div class="splash-subtitle">BRAND OPENING EXPERIENCE</div>
+    <div class="splash-caption">因機有曜，光浮初現</div>
+  </div>
+</div>
+
+<div class="page">
+  <main class="phone">
+    <section class="panel">
+      <div class="hero">
+        <div class="brand-row">
+          <div class="brand">
+            <span class="brand-dot">財</span>
+            <span>偏財時刻</span>
+          </div>
+          <span class="soft-pill" id="membershipTag">免費版：僅可查看今日</span>
+        </div>
+
+        <div id="heroToday" class="view active">
+          <h1 class="headline">今日較值得留意的機會時段</h1>
+          <div class="big-time" id="heroTime">請先查看</div>
+          <p class="lead" id="heroLead">請選擇出生資料並按「開始查看」，系統將依當日節奏整理較值得留意的時段。</p>
+        </div>
+
+        <div id="heroPlans" class="view">
+          <h1 class="headline">以清楚的方案分層體驗</h1>
+          <p class="lead">免費版可查看今日結果；如需查看連續七日節奏，可選擇七日方案；如需長期使用與時段提醒，可訂閱月費會員。</p>
+        </div>
+
+        <div id="heroSettings" class="view">
+          <h1 class="headline">版面與閱讀設定</h1>
+          <p class="lead">可切換淺色與深色版面，亦可選擇小字、中字、大字，以配合不同閱讀習慣。</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="segment" role="tablist" aria-label="頁面切換">
+          <button class="active" data-view="today" type="button">今日結果</button>
+          <button data-view="plans" type="button">會員方案</button>
+          <button data-view="settings" type="button">設定</button>
+        </div>
+
+        <div id="view-today" class="view active">
+          <div class="notice" id="engineStatus">請輸入出生資料並按「開始查看」。</div>
+
+          <div class="form-stack" style="margin-top: 14px;">
+            <article class="input-card">
+              <div class="input-title">基本資料</div>
+              <div class="subtext">出生年份支援 1900–2050 年，查看年份支援 2026–2050 年。請選擇出生資料後按「開始查看」；性別欄位保留供後續大運順逆計算使用。</div>
+
+              <div class="input-grid" style="margin-top: 14px;">
+                <div class="field full">
+                  <label for="nameInput">稱呼</label>
+                  <input id="nameInput" value="" placeholder="請輸入稱呼（選填）" />
+                </div>
+
+                <div class="field">
+                  <label for="birthYearPicker">出生年份</label>
+                  <button class="picker-btn empty" data-picker-target="birthYear" id="birthYearPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="birthYear" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="birthMonthPicker">出生月份</label>
+                  <button class="picker-btn empty" data-picker-target="birthMonth" id="birthMonthPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="birthMonth" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="birthDayPicker">出生日期</label>
+                  <button class="picker-btn empty" data-picker-target="birthDay" id="birthDayPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="birthDay" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="birthHourPicker">出生小時</label>
+                  <button class="picker-btn empty" data-picker-target="birthHour" id="birthHourPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="birthHour" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="birthMinutePicker">出生分鐘</label>
+                  <button class="picker-btn empty" data-picker-target="birthMinute" id="birthMinutePicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="birthMinute" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="genderPicker">性別</label>
+                  <button class="picker-btn empty" data-picker-target="gender" id="genderPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="gender" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="observeYearPicker">查看年份</label>
+                  <button class="picker-btn empty" data-picker-target="observeYear" id="observeYearPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="observeYear" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="observeMonthPicker">查看月份</label>
+                  <button class="picker-btn empty" data-picker-target="observeMonth" id="observeMonthPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="observeMonth" tabindex="-1"></select>
+                </div>
+
+                <div class="field">
+                  <label for="observeDayPicker">查看日期</label>
+                  <button class="picker-btn empty" data-picker-target="observeDay" id="observeDayPicker" type="button">請選擇</button>
+                  <select class="hidden-native" id="observeDay" tabindex="-1"></select>
+                </div>
+              </div>
+
+              <div class="action-row" style="margin-top: 14px;">
+                <button class="primary-btn" id="calcBtn" type="button">開始查看</button>
+                <button class="ghost-btn" id="resetBtn" type="button">清空重設</button>
+              </div>
+            </article>
+          </div>
+
+          <div class="detail-list" style="margin-top: 16px;">
+            <article class="detail-card">
+              <div class="detail-title">本命摘要</div>
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <label>本命四柱</label>
+                  <div id="metaPillars">—</div>
+                </div>
+                <div class="meta-item">
+                  <label>查看日期</label>
+                  <div id="metaObserve">—</div>
+                </div>
+                <div class="meta-item full">
+                  <label>今日配合方向</label>
+                  <div id="metaSupport">—</div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="result-list" style="margin-top: 16px;" id="topSlotsList"></div>
+
+          <div class="detail-list" style="margin-top: 16px;">
+            <article class="detail-card">
+              <div class="detail-title">當日 12 個時段完整排序</div>
+              <div class="subtext">七日方案或月費會員啟用後，可點選下方列表中的日期，切換並查看該日完整 12 個時段排序。</div>
+              <div id="hourlyRankingList" class="rank-list"></div>
+            </article>
+          </div>
+
+          <div class="seven-day-list" style="margin-top: 16px;" id="sevenDayList"></div>
+        </div>
+
+        <div id="view-plans" class="view">
+          <div class="plan-list">
+            <article class="plan-card">
+              <span class="soft-pill">免費體驗</span>
+              <h3 style="margin-top: 14px;">免費版</h3>
+              <div class="price">免費</div>
+              <div class="plan-meta">
+                <div>僅可查看當日結果</div>
+                <div>可體驗版面、字級與深淺主題</div>
+                <div>七日內容與延伸日期維持鎖定</div>
+              </div>
+            </article>
+
+            <article class="plan-card featured">
+              <span class="soft-pill">短期體驗</span>
+              <h3 style="margin-top: 14px;">七日體驗方案</h3>
+              <div class="price" id="sevenDayPrice">價格將於 App Store 顯示</div>
+              <div class="plan-meta">
+                <div>一次性付款，連續解鎖 7 天內容</div>
+                <div>非自動續訂，滿 7 日後自動斷開並回復為僅可查看即日</div>
+                <div>可連續比較未來七日最佳時段</div>
+              </div>
+              <div class="action-row" style="margin-top: 14px;">
+                <button class="primary-btn" id="buySevenDayBtn" data-open-sheet type="button">以 App Store 解鎖 7 天</button>
+              </div>
+            </article>
+
+            <article class="plan-card">
+              <span class="soft-pill">完整方案</span>
+              <h3 style="margin-top: 14px;">月費會員</h3>
+              <div class="price" id="monthlyPrice">價格將於 App Store 顯示</div>
+              <div class="plan-meta">
+                <div>不限次數查看每日結果與七日內容</div>
+                <div>保留深色、淺色與字級設定</div>
+                <div>支援月費會員專屬頁面時段提醒</div>
+                <div>每月自動續訂；可隨時在 Apple ID 訂閱設定中取消</div>
+              </div>
+              <div class="action-row" style="margin-top: 14px;">
+                <button class="ghost-btn" id="buyMonthlyBtn" data-open-sheet type="button">以 App Store 訂閱月費會員</button>
+              </div>
+              <div class="action-row" style="margin-top: 10px;">
+                <button class="ghost-btn" id="restorePurchasesBtn" type="button" style="width: 100%;">恢復購買記錄</button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div id="view-settings" class="view">
+          <div class="setting-list">
+            <article class="setting-card">
+              <div>
+                <h3>主題版本</h3>
+                <p class="subtext">可於淺色與深色版面之間切換。</p>
+              </div>
+              <div class="chip-row">
+                <button class="chip active" data-theme-choice="light" type="button">淺色</button>
+                <button class="chip" data-theme-choice="dark" type="button">深色</button>
+              </div>
+            </article>
+
+            <article class="setting-card">
+              <div>
+                <h3>字型大小</h3>
+                <p class="subtext">提供小字、中字、大字三種閱讀模式。</p>
+              </div>
+              <div class="chip-row">
+                <button class="chip" data-scale-choice="small" type="button">小字</button>
+                <button class="chip active" data-scale-choice="medium" type="button">中字</button>
+                <button class="chip" data-scale-choice="large" type="button">大字</button>
+              </div>
+            </article>
+
+            <article class="setting-card" id="memberReminderCard">
+              <div>
+                <h3>提醒設定</h3>
+                <p class="subtext">月費會員可按今日較值得留意的時段，在開始前 15 分鐘、前 5 分鐘或開始時收到頁面提醒。</p>
+              </div>
+              <div class="chip-row">
+                <button class="chip" data-reminder-choice="off" type="button">關閉</button>
+                <button class="chip active" data-reminder-choice="all" type="button">全部</button>
+                <button class="chip" data-reminder-choice="15" type="button">提前15分</button>
+                <button class="chip" data-reminder-choice="5" type="button">提前5分</button>
+                <button class="chip" data-reminder-choice="0" type="button">準時提醒</button>
+              </div>
+              <div class="notice" id="reminderStatus" style="margin-top: 12px;">此功能為月費會員專屬。</div>
+            </article>
+
+            <article class="setting-card">
+              <h3>產品聲明</h3>
+              <p class="subtext">本服務提供生活節奏參考與娛樂閱讀內容，不構成投資、財務、醫療或法律建議，亦不保證特定結果。</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="blessing-note" aria-label="善念寄語">
+          <div class="blessing-title">善念寄語</div>
+          <p class="blessing-text">偏財乃順時而遇之意外收穫。若您因把握良機而有所斬獲、得享意外之財，不妨隨緣行善、回饋社會，將這份幸運化為幫助他人的溫暖力量，讓福澤長流。</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="subscribeSheet">
+  <div class="sheet-card">
+    <h2>解鎖連續查看權限</h2>
+    <p>您目前使用免費版，僅可查看當日內容。若需查看連續七日節奏，或長期保留完整結果，可於此選擇方案。</p>
+    <div class="sheet-actions">
+      <button class="primary-btn" id="confirmSevenDayPurchase" type="button">以 App Store 購買七日方案</button>
+      <button class="ghost-btn" id="confirmMonthlyPurchase" type="button">以 App Store 訂閱月費會員</button>
+      <button class="ghost-btn" id="restoreSheetBtn" type="button">恢復購買記錄</button>
+      <button class="ghost-btn" id="closeSheet" type="button">稍後再說</button>
+    </div>
+    <div class="footnote">七日方案為一次性付款，不會自動續期，滿 7 日後自動回復為僅可查看即日。月費會員每月自動續期，可於 Apple ID 訂閱設定中取消。</div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="pickerBackdrop"></div>
+<div class="sheet" id="pickerSheet">
+  <div class="picker-sheet-card">
+    <h2 class="picker-title" id="pickerTitle">選擇項目</h2>
+    <p class="subtext" id="pickerHint">上下滑動或直接點選後按完成。</p>
+    <div class="wheel-wrap">
+      <div class="wheel-overlay"></div>
+      <div class="wheel-list" id="pickerOptions"></div>
+    </div>
+    <div class="picker-actions">
+      <button class="ghost-btn" id="pickerCancelBtn" type="button">取消</button>
+      <button class="primary-btn" id="pickerDoneBtn" type="button">完成</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+
+<script>
+  (function () {
+    'use strict';
+
+    var root = document.documentElement;
+    var BIRTH_YEAR_MIN = 1900;
+    var BIRTH_YEAR_MAX = 2050;
+    var OBSERVE_YEAR_MIN = 2026;
+    var OBSERVE_YEAR_MAX = 2050;
+    var SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    // 1.5 秒高貴開場動畫，時間一到準時優雅淡出
+    function hideSplashSafely() {
+      var splash = $('splashScreen');
+      if (splash) {
+        splash.classList.add('hidden');
+      }
+    }
+    setTimeout(hideSplashSafely, 1500);
+
+    function readStored(key, fallback) {
+      try {
+        var val = localStorage.getItem(key);
+        return val !== null && val !== undefined ? val : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function writeStored(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (e) {}
+    }
+
+    function removeStored(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {}
+    }
+
+    // 內建純本地四柱八字計算引擎（支援 1900–2050 年，完全離線秒算，無須等待任何外部網址）
+    var STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    var BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    var JIAZI = [];
+    for (var i = 0; i < 60; i++) {
+      JIAZI.push(STEMS[i % 10] + BRANCHES[i % 12]);
+    }
+
+    function getSolarTermDay(year, termIndex) {
+      var C_20 = [5.4055, 20.12, 3.87, 18.73, 5.63, 20.646, 4.81, 20.1, 5.52, 21.04, 5.678, 21.37, 7.108, 22.83, 7.5, 23.13, 7.646, 23.042, 8.318, 23.438, 7.438, 22.36, 7.18, 21.94];
+      var C_21 = [5.4055, 20.12, 3.87, 18.73, 5.63, 20.646, 4.81, 20.1, 5.52, 21.04, 5.678, 21.37, 7.108, 22.83, 7.5, 23.13, 7.646, 23.042, 8.318, 23.438, 7.438, 22.36, 7.18, 21.94];
+      var y = year % 100;
+      var c = year >= 2000 ? C_21[termIndex] : C_20[termIndex];
+      var leap = Math.floor((y - 1) / 4);
+      if (year >= 2000 && (termIndex === 0 || termIndex === 1 || termIndex === 2 || termIndex === 3)) {
+        leap = Math.floor(y / 4);
+      }
+      return Math.floor(y * 0.2422 + c) - leap;
+    }
+
+    function getEightChar(y, m, d, h, min) {
+      var effY = y, effM = m, effD = d;
+      if (h === 23) {
+        var nextDate = new Date(y, m - 1, d + 1);
+        effY = nextDate.getFullYear();
+        effM = nextDate.getMonth() + 1;
+        effD = nextDate.getDate();
+      }
+
+      // 年柱（以立春為界）
+      var lichunDay = getSolarTermDay(y, 2);
+      var baziYear = (m < 2 || (m === 2 && d < lichunDay)) ? y - 1 : y;
+      var yearIdx = ((baziYear - 1984) % 60 + 60) % 60;
+      var yearPillar = JIAZI[yearIdx];
+
+      // 月柱（以十二節為界）
+      var jieMap = [
+        { m: 1, term: 0, branchIdx: 1 },
+        { m: 2, term: 2, branchIdx: 2 },
+        { m: 3, term: 4, branchIdx: 3 },
+        { m: 4, term: 6, branchIdx: 4 },
+        { m: 5, term: 8, branchIdx: 5 },
+        { m: 6, term: 10, branchIdx: 6 },
+        { m: 7, term: 12, branchIdx: 7 },
+        { m: 8, term: 14, branchIdx: 8 },
+        { m: 9, term: 16, branchIdx: 9 },
+        { m: 10, term: 18, branchIdx: 10 },
+        { m: 11, term: 20, branchIdx: 11 },
+        { m: 12, term: 22, branchIdx: 0 }
+      ];
+      var mInfo = jieMap[m - 1];
+      var jieDay = getSolarTermDay(y, mInfo.term);
+      var monthBranchIdx = d >= jieDay ? mInfo.branchIdx : (mInfo.branchIdx + 11) % 12;
+      var monthOrder = (monthBranchIdx - 2 + 12) % 12;
+      var yearStemIdx = STEMS.indexOf(yearPillar.charAt(0));
+      var firstMonthStemIdx = ((yearStemIdx % 5) * 2 + 2) % 10;
+      var monthStemIdx = (firstMonthStemIdx + monthOrder) % 10;
+      var monthPillar = STEMS[monthStemIdx] + BRANCHES[monthBranchIdx];
+
+      // 日柱
+      var utcCurr = Date.UTC(effY, effM - 1, effD);
+      var utcBase = Date.UTC(2000, 0, 1);
+      var diffDays = Math.round((utcCurr - utcBase) / 86400000);
+      var dayIdx = ((54 + diffDays) % 60 + 60) % 60;
+      var dayPillar = JIAZI[dayIdx];
+
+      // 時柱
+      var hourBranchIdx = h === 23 ? 0 : Math.floor((h + 1) / 2) % 12;
+      var dayStemIdx = STEMS.indexOf(dayPillar.charAt(0));
+      var ziHourStemIdx = (dayStemIdx % 5) * 2;
+      var hourStemIdx = (ziHourStemIdx + hourBranchIdx) % 10;
+      var hourPillar = STEMS[hourStemIdx] + BRANCHES[hourBranchIdx];
+
+      return {
+        getYear: function () { return yearPillar; },
+        getMonth: function () { return monthPillar; },
+        getDay: function () { return dayPillar; },
+        getTime: function () { return hourPillar; }
+      };
+    }
+
+    var stemInfo = {
+      '甲': { element: '木', polarity: '陽' },
+      '乙': { element: '木', polarity: '陰' },
+      '丙': { element: '火', polarity: '陽' },
+      '丁': { element: '火', polarity: '陰' },
+      '戊': { element: '土', polarity: '陽' },
+      '己': { element: '土', polarity: '陰' },
+      '庚': { element: '金', polarity: '陽' },
+      '辛': { element: '金', polarity: '陰' },
+      '壬': { element: '水', polarity: '陽' },
+      '癸': { element: '水', polarity: '陰' }
+    };
+
+    var hiddenStems = {
+      '子': ['癸'],
+      '丑': ['己', '癸', '辛'],
+      '寅': ['甲', '丙', '戊'],
+      '卯': ['乙'],
+      '辰': ['戊', '乙', '癸'],
+      '巳': ['丙', '庚', '戊'],
+      '午': ['丁', '己'],
+      '未': ['己', '丁', '乙'],
+      '申': ['庚', '壬', '戊'],
+      '酉': ['辛'],
+      '戌': ['戊', '辛', '丁'],
+      '亥': ['壬', '甲']
+    };
+
+    var clashPairs = { '子': '午', '午': '子', '丑': '未', '未': '丑', '寅': '申', '申': '寅', '卯': '酉', '酉': '卯', '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳' };
+    var combinePairs = { '子': '丑', '丑': '子', '寅': '亥', '亥': '寅', '卯': '戌', '戌': '卯', '辰': '酉', '酉': '辰', '巳': '申', '申': '巳', '午': '未', '未': '午' };
+    var harmPairs = { '子': '未', '未': '子', '丑': '午', '午': '丑', '寅': '巳', '巳': '寅', '卯': '辰', '辰': '卯', '申': '亥', '亥': '申', '酉': '戌', '戌': '酉' };
+
+    var hourSlots = [
+      { name: '子時', range: '23:00–00:59', hour: 23, minute: 30 },
+      { name: '丑時', range: '01:00–02:59', hour: 1, minute: 30 },
+      { name: '寅時', range: '03:00–04:59', hour: 3, minute: 30 },
+      { name: '卯時', range: '05:00–06:59', hour: 5, minute: 30 },
+      { name: '辰時', range: '07:00–08:59', hour: 7, minute: 30 },
+      { name: '巳時', range: '09:00–10:59', hour: 9, minute: 30 },
+      { name: '午時', range: '11:00–12:59', hour: 11, minute: 30 },
+      { name: '未時', range: '13:00–14:59', hour: 13, minute: 30 },
+      { name: '申時', range: '15:00–16:59', hour: 15, minute: 30 },
+      { name: '酉時', range: '17:00–18:59', hour: 17, minute: 30 },
+      { name: '戌時', range: '19:00–20:59', hour: 19, minute: 30 },
+      { name: '亥時', range: '21:00–22:59', hour: 21, minute: 30 }
+    ];
+
+    function pad(v) {
+      var s = String(v);
+      return s.length < 2 ? '0' + s : s;
+    }
+
+    function stemElement(stem) { return stemInfo[stem].element; }
+    function controlElement(el) { return { '木': '土', '火': '金', '土': '水', '金': '木', '水': '火' }[el]; }
+    function generatedElement(el) { return { '木': '水', '火': '木', '土': '火', '金': '土', '水': '金' }[el]; }
+    function outputElement(el) { return { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' }[el]; }
+    function officerElement(el) { return { '木': '金', '火': '水', '土': '木', '金': '火', '水': '土' }[el]; }
+
+    function getWealthStars(dayStem) {
+      var info = stemInfo[dayStem];
+      var wealthElement = controlElement(info.element);
+      var partial = '', direct = '';
+      Object.keys(stemInfo).forEach(function (st) {
+        if (stemInfo[st].element === wealthElement) {
+          if (stemInfo[st].polarity === info.polarity) partial = st;
+          else direct = st;
+        }
+      });
+      return { wealthElement: wealthElement, partial: partial, direct: direct };
+    }
+
+    function analyzeStrength(pillars, dayStem) {
+      var dayEl = stemElement(dayStem);
+      var resEl = generatedElement(dayEl);
+      var wealthEl = controlElement(dayEl);
+      var offEl = officerElement(dayEl);
+      var outEl = outputElement(dayEl);
+
+      var strongSeason = { '木': ['寅', '卯'], '火': ['巳', '午'], '土': ['辰', '戌', '丑', '未'], '金': ['申', '酉'], '水': ['亥', '子'] };
+      var supportSeason = { '木': ['亥', '子'], '火': ['寅', '卯'], '土': ['巳', '午'], '金': ['辰', '戌', '丑', '未'], '水': ['申', '酉'] };
+
+      var score = 0;
+      var monthBranch = pillars.month.charAt(1);
+      if ((strongSeason[dayEl] || []).indexOf(monthBranch) !== -1) score += 3;
+      else if ((supportSeason[dayEl] || []).indexOf(monthBranch) !== -1) score += 2;
+
+      [pillars.year.charAt(0), pillars.month.charAt(0), pillars.day.charAt(0), pillars.hour.charAt(0)].forEach(function (st) {
+        var el = stemElement(st);
+        if (el === dayEl) score += 1;
+        if (el === resEl) score += 1;
+        if (el === wealthEl) score -= 1;
+        if (el === offEl) score -= 1;
+        if (el === outEl) score -= 0.5;
+      });
+
+      [pillars.year.charAt(1), pillars.month.charAt(1), pillars.day.charAt(1), pillars.hour.charAt(1)].forEach(function (br) {
+        (hiddenStems[br] || []).forEach(function (st) {
+          var el = stemElement(st);
+          if (el === dayEl) score += 0.5;
+          if (el === resEl) score += 0.5;
+          if (el === wealthEl) score -= 0.5;
+          if (el === offEl) score -= 0.5;
+        });
+      });
+
+      var label = '中和';
+      if (score >= 5) label = '身強';
+      else if (score >= 3) label = '偏強';
+      else if (score <= -2) label = '身弱';
+      else if (score <= 0) label = '偏弱';
+
+      return {
+        score: score,
+        label: label,
+        dayElement: dayEl,
+        resourceElement: resEl,
+        wealthElement: wealthEl,
+        officerElement: offEl,
+        outputElement: outEl
+      };
+    }
+
+    function supportPlan(strength) {
+      if (strength.label === '身強' || strength.label === '偏強') {
+        return {
+          good: [strength.wealthElement, strength.officerElement, strength.outputElement],
+          bad: [strength.dayElement, strength.resourceElement]
+        };
+      }
+      if (strength.label === '身弱' || strength.label === '偏弱') {
+        return {
+          good: [strength.dayElement, strength.resourceElement],
+          bad: [strength.wealthElement, strength.officerElement, strength.outputElement]
+        };
+      }
+      return {
+        good: [strength.wealthElement, strength.outputElement, strength.resourceElement],
+        bad: []
+      };
+    }
+
+    function relationBetween(a, b) {
+      if (clashPairs[a] === b) return '沖';
+      if (combinePairs[a] === b) return '合';
+      if (harmPairs[a] === b) return '害';
+      return '';
+    }
+
+    function scoreHourSlot(slotEight, observeEight, wealth, dayMaster, strength, plan, natalBranches) {
+      var score = 0;
+      var positiveReasons = [];
+      var negativeReasons = [];
+      var observeDay = observeEight.getDay();
+      var observeStem = observeDay.charAt(0);
+      var observeBranch = observeDay.charAt(1);
+      var hourPillar = slotEight.getTime();
+      var hourStem = hourPillar.charAt(0);
+      var hourBranch = hourPillar.charAt(1);
+      var hourStemEl = stemElement(hourStem);
+
+      var seedBase = hourBranch.charCodeAt(0) + observeBranch.charCodeAt(0);
+      function pick(arr, offset) {
+        return arr[(seedBase + (offset || 0)) % arr.length];
+      }
+      function pushUnique(arr, text) {
+        if (text && arr.indexOf(text) === -1) arr.push(text);
+      }
+
+      if (observeStem === wealth.partial) {
+        score += 2;
+        pushUnique(positiveReasons, pick(['今日機會訊號較明顯', '今日整體機會感較強', '今日可留意的機會訊號較多'], 1));
+      }
+      if ((hiddenStems[observeBranch] || []).indexOf(wealth.partial) !== -1) {
+        score += 1;
+        pushUnique(positiveReasons, pick(['今日有可留意的潛在機會', '今日仍有後續空間可觀察', '今日暗藏機會，可先留意變化'], 2));
+      }
+      if (hourStem === wealth.partial) {
+        score += 6;
+        pushUnique(positiveReasons, pick(['此時段機會較明顯', '此時段較容易出現好時機', '此時段值得優先留意'], 3));
+      }
+      if ((hiddenStems[hourBranch] || []).indexOf(wealth.partial) !== -1) {
+        score += 3;
+        pushUnique(positiveReasons, pick(['此時段還有潛在機會', '此時段可留意細微變化', '此時段後續空間較多'], 4));
+      }
+      if (hourStem === wealth.direct) {
+        score += 1;
+        pushUnique(positiveReasons, pick(['此時段穩定進帳訊號較明顯', '此時段較適合穩步安排', '此時段節奏較穩，適合逐步處理'], 5));
+      }
+      if (plan.good.indexOf(hourStemEl) !== -1) {
+        score += 2;
+        pushUnique(positiveReasons, pick(['此時段節奏與你較配合', '此時段步調與你較合拍', '此時段整體節奏較順手'], 6));
+      }
+      if (plan.bad.indexOf(hourStemEl) !== -1) {
+        score -= 2;
+        pushUnique(negativeReasons, pick(['此時段節奏與你未必配合', '此時段步調未算合拍', '此時段容易有些卡住'], 7));
+      }
+      if ((hiddenStems[hourBranch] || []).some(function (st) { return plan.good.indexOf(stemElement(st)) !== -1; })) {
+        score += 1;
+        pushUnique(positiveReasons, pick(['此時段條件與你較配合', '此時段內在條件較順', '此時段整體配合度不錯'], 8));
+      }
+      if ((hiddenStems[hourBranch] || []).some(function (st) { return plan.bad.indexOf(stemElement(st)) !== -1; })) {
+        score -= 1;
+        pushUnique(negativeReasons, pick(['此時段條件未必配合', '此時段內在條件略有阻力', '此時段整體配合度有限'], 9));
+      }
+
+      if (hourStem === dayMaster) {
+        if (strength.label === '身弱' || strength.label === '偏弱') {
+          score += 1;
+          pushUnique(positiveReasons, pick(['此時段對你較有支撐', '此時段較容易借到力', '此時段對你較有幫助'], 10));
+        } else {
+          score -= 1;
+          pushUnique(negativeReasons, pick(['此時段容易增加消耗', '此時段較容易分散力氣', '此時段可能讓你較費神'], 11));
+        }
+      }
+
+      natalBranches.forEach(function (item) {
+        var rel = relationBetween(item.branch, hourBranch);
+        if (rel === '合') {
+          score += 1;
+          pushUnique(positiveReasons, pick(['與本命' + item.name + '較協調', '與本命' + item.name + '配合度不錯', '與本命' + item.name + '節奏較順'], 12));
+        } else if (rel === '沖') {
+          score -= 2;
+          pushUnique(negativeReasons, pick(['與本命' + item.name + '有衝突', '與本命' + item.name + '不太合拍', '與本命' + item.name + '容易出現拉扯'], 13));
+        } else if (rel === '害') {
+          score -= 1;
+          pushUnique(negativeReasons, pick(['與本命' + item.name + '不太協調', '與本命' + item.name + '略有牽制', '與本命' + item.name + '配合度偏低'], 14));
+        }
+      });
+
+      var relObserve = relationBetween(observeBranch, hourBranch);
+      if (relObserve === '合') {
+        score += 1;
+        pushUnique(positiveReasons, pick(['與查看日較協調', '與查看日節奏相近', '與查看日配合度不錯'], 15));
+      } else if (relObserve === '沖') {
+        score -= 2;
+        pushUnique(negativeReasons, pick(['與查看日有衝突', '與查看日步調不一致', '與查看日容易出現拉扯'], 16));
+      } else if (relObserve === '害') {
+        score -= 1;
+        pushUnique(negativeReasons, pick(['與查看日不太協調', '與查看日略有牽制', '與查看日配合度有限'], 17));
+      }
+
+      var strongSummaries = ['此時段機會活躍，可優先留意', '此時段整體條件較順，適合把握', '此時段好時機較集中，值得優先安排', '此時段表現突出，可先放在前面'];
+      var mildSummaries = ['此時段條件不錯，可逐步留意', '此時段有可把握空間，可先安排', '此時段表現平穩，適合順勢處理', '此時段節奏不差，可先納入考慮'];
+      var neutralSummaries = ['此時段訊號中性，可先觀察', '此時段變化不大，適合先看看', '此時段以穩為主，可保留彈性', '此時段沒有明顯偏向，可先觀望'];
+      var negativeSummaries = ['此時段整體條件一般，建議保守安排', '此時段阻力略多，可先放慢', '此時段配合度有限，宜先觀望', '此時段不算理想，先保留彈性較穩'];
+
+      var reasons = [];
+      if (score >= 8) reasons = [pick(strongSummaries, 18)].concat(positiveReasons.slice(0, 2));
+      else if (score >= 4) reasons = [pick(mildSummaries, 19)].concat(positiveReasons.slice(0, 2));
+      else if (score >= 1) reasons = [pick(neutralSummaries, 20)].concat(positiveReasons.slice(0, 1));
+      else reasons = [pick(negativeSummaries, 21)].concat(negativeReasons.slice(0, 2));
+
+      var uniqueReasons = [];
+      reasons.forEach(function (r) {
+        if (r && uniqueReasons.indexOf(r) === -1 && uniqueReasons.length < 3) {
+          uniqueReasons.push(r);
+        }
+      });
+
+      return { score: score, reasons: uniqueReasons, pillar: hourPillar };
+    }
+
+    function getLevelText(score) {
+      if (score >= 8) return '機會較高・可把握';
+      if (score >= 4) return '平穩・可觀察';
+      return '宜觀望・保守處理';
+    }
+
+    var membershipMode = 'free';
+    var reminderMode = readStored('reminderMode', 'all');
+    if (['off', 'all', '15', '5', '0'].indexOf(reminderMode) === -1) {
+      reminderMode = 'all';
+    }
+
+    var birthConfirmed = false;
+    var birthDirty = true;
+    var confirmedBirth = null;
+    var todayReminderResult = null;
+    var reminderTimer = null;
+    var toastTimer = null;
+    var pickerState = null;
+    var wheelScrollTimer = null;
+    var sentDay = '';
+    var sentKeys = {};
+
+    function todayParts() {
+      var now = new Date();
+      return { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
+    }
+
+    function dateKey(t) {
+      return t.y + '-' + pad(t.m) + '-' + pad(t.d);
+    }
+
+    function validDate(y, m, d) {
+      var dt = new Date(y, m - 1, d);
+      return dt.getFullYear() === Number(y) && dt.getMonth() === Number(m) - 1 && dt.getDate() === Number(d);
+    }
+
+    function validBirth(b) {
+      return b &&
+        Number.isInteger(b.by) && b.by >= BIRTH_YEAR_MIN && b.by <= BIRTH_YEAR_MAX &&
+        validDate(b.by, b.bm, b.bd) &&
+        Number.isInteger(b.bh) && b.bh >= 0 && b.bh <= 23 &&
+        Number.isInteger(b.bmin) && b.bmin >= 0 && b.bmin <= 59 &&
+        (b.gender === '男' || b.gender === '女');
+    }
+
+    function getBirthInput() {
+      var byStr = $('birthYear').value;
+      var bmStr = $('birthMonth').value;
+      var bdStr = $('birthDay').value;
+      var bhStr = $('birthHour').value;
+      var bminStr = $('birthMinute').value;
+      var genderStr = $('gender').value;
+      if (byStr === '' || bmStr === '' || bdStr === '' || bhStr === '' || bminStr === '' || genderStr === '') {
+        return null;
+      }
+      return {
+        by: Number(byStr),
+        bm: Number(bmStr),
+        bd: Number(bdStr),
+        bh: Number(bhStr),
+        bmin: Number(bminStr),
+        gender: genderStr
+      };
+    }
+
+    function fillSelect(id, start, end, suffix, padTwo) {
+      var sel = $(id);
+      if (!sel) return;
+      sel.innerHTML = '';
+      var emptyOpt = document.createElement('option');
+      emptyOpt.value = '';
+      emptyOpt.textContent = '請選擇';
+      sel.appendChild(emptyOpt);
+
+      for (var v = start; v <= end; v++) {
+        var opt = document.createElement('option');
+        opt.value = String(v);
+        var txt = padTwo ? pad(v) : String(v);
+        opt.textContent = txt + (suffix || '');
+        sel.appendChild(opt);
+      }
+    }
+
+    function refreshPickerButtons() {
+      var btns = document.querySelectorAll('[data-picker-target]');
+      for (var i = 0; i < btns.length; i++) {
+        var btn = btns[i];
+        var targetId = btn.getAttribute('data-picker-target');
+        var sel = $(targetId);
+        var text = '請選擇';
+        if (sel && sel.value !== '') {
+          var selectedOpt = sel.options[sel.selectedIndex];
+          text = selectedOpt ? selectedOpt.textContent : sel.value;
+        }
+        btn.textContent = text;
+        if (text === '請選擇') btn.classList.add('empty');
+        else btn.classList.remove('empty');
+      }
+    }
+
+    function setObserveDate(y, m, d) {
+      var selY = $('observeYear');
+      if (selY) {
+        var exists = false;
+        for (var i = 0; i < selY.options.length; i++) {
+          if (Number(selY.options[i].value) === Number(y)) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          var opt = document.createElement('option');
+          opt.value = String(y);
+          opt.textContent = String(y) + '年';
+          selY.appendChild(opt);
+        }
+        selY.value = String(y);
+      }
+      if ($('observeMonth')) $('observeMonth').value = String(m);
+      if ($('observeDay')) $('observeDay').value = String(d);
+      refreshPickerButtons();
+    }
+
+    function setObserveDateToToday() {
+      var t = todayParts();
+      setObserveDate(t.y, t.m, t.d);
+    }
+
+    function clearBirthFieldsToEmpty() {
+      $('nameInput').value = '';
+      $('birthYear').value = '';
+      $('birthMonth').value = '';
+      $('birthDay').value = '';
+      $('birthHour').value = '';
+      $('birthMinute').value = '';
+      $('gender').value = '';
+      birthConfirmed = false;
+      birthDirty = true;
+      confirmedBirth = null;
+      todayReminderResult = null;
+      removeStored('birthProfile');
+      $('metaPillars').textContent = '—';
+      $('metaObserve').textContent = '—';
+      $('metaSupport').textContent = '—';
+      $('heroTime').textContent = '請先查看';
+      $('heroLead').textContent = '請選擇出生資料並按「開始查看」，系統將依當日節奏整理較值得留意的時段。';
+      $('engineStatus').textContent = '請輸入出生資料並按「開始查看」。';
+      $('topSlotsList').innerHTML = '';
+      $('hourlyRankingList').innerHTML = '';
+      $('sevenDayList').innerHTML = '';
+      setObserveDateToToday();
+      refreshPickerButtons();
+      updateReminderUI();
+    }
+
+    var pickerTitles = {
+      birthYear: '選擇出生年份',
+      birthMonth: '選擇出生月份',
+      birthDay: '選擇出生日期',
+      birthHour: '選擇出生小時',
+      birthMinute: '選擇出生分鐘',
+      gender: '選擇性別',
+      observeYear: '選擇查看年份',
+      observeMonth: '選擇查看月份',
+      observeDay: '選擇查看日期'
+    };
+
+    function setWheelActive() {
+      if (!pickerState) return;
+      var list = $('pickerOptions');
+      var items = list.querySelectorAll('.wheel-item');
+      if (!items.length) return;
+      var center = list.scrollTop + list.clientHeight / 2;
+      var nearest = items[0];
+      var minDiff = Infinity;
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var itemCenter = item.offsetTop + item.offsetHeight / 2;
+        var diff = Math.abs(itemCenter - center);
+        if (diff < minDiff) {
+          minDiff = diff;
+          nearest = item;
+        }
+      }
+      for (var j = 0; j < items.length; j++) {
+        if (items[j] === nearest) items[j].classList.add('active');
+        else items[j].classList.remove('active');
+      }
+      pickerState.value = nearest.getAttribute('data-value');
+    }
+
+    function snapWheelToValue(val) {
+      var list = $('pickerOptions');
+      var items = list.querySelectorAll('.wheel-item');
+      var targetItem = null;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].getAttribute('data-value') === String(val)) {
+          targetItem = items[i];
+          break;
+        }
+      }
+      if (!targetItem && items.length) targetItem = items[0];
+      if (!targetItem) return;
+      var top = targetItem.offsetTop - (list.clientHeight / 2) + (targetItem.offsetHeight / 2);
+      list.scrollTop = Math.max(0, top);
+      setWheelActive();
+    }
+
+    function openPicker(targetId) {
+      var sel = $(targetId);
+      if (!sel) return;
+      var currentVal = sel.value;
+      if (!currentVal) {
+        if (targetId === 'birthYear') currentVal = '1990';
+        else if (targetId === 'observeYear') currentVal = String(Math.max(OBSERVE_YEAR_MIN, Math.min(OBSERVE_YEAR_MAX, todayParts().y)));
+        else if (targetId === 'birthMonth' || targetId === 'birthDay') currentVal = '1';
+        else if (targetId === 'birthHour') currentVal = '12';
+        else if (targetId === 'birthMinute') currentVal = '0';
+        else if (targetId === 'gender') currentVal = '男';
+      }
+      pickerState = { target: targetId, value: String(currentVal) };
+      $('pickerTitle').textContent = pickerTitles[targetId] || '選擇項目';
+
+      var list = $('pickerOptions');
+      list.innerHTML = '';
+      for (var i = 0; i < sel.options.length; i++) {
+        var opt = sel.options[i];
+        if (opt.value === '') continue;
+        var div = document.createElement('div');
+        div.className = 'wheel-item';
+        div.setAttribute('data-value', opt.value);
+        div.textContent = opt.textContent;
+        (function (v) {
+          div.addEventListener('click', function () {
+            pickerState.value = v;
+            snapWheelToValue(v);
+          });
+        })(opt.value);
+        list.appendChild(div);
+      }
+
+      $('pickerSheet').classList.add('active');
+      $('pickerBackdrop').classList.add('active');
+      setTimeout(function () {
+        snapWheelToValue(pickerState.value);
+      }, 40);
+    }
+
+    function closePicker() {
+      $('pickerSheet').classList.remove('active');
+      $('pickerBackdrop').classList.remove('active');
+      pickerState = null;
+    }
+
+    function applyPicker() {
+      if (!pickerState) {
+        closePicker();
+        return;
+      }
+      setWheelActive();
+      var sel = $(pickerState.target);
+      if (sel) {
+        sel.value = pickerState.value;
+      }
+      if (pickerState.target.indexOf('birth') === 0 || pickerState.target === 'gender') {
+        pauseForBirthEdit();
+      }
+      refreshPickerButtons();
+      closePicker();
+    }
+
+    function toggleSheet(show) {
+      if (show) {
+        $('subscribeSheet').classList.add('active');
+        $('sheetBackdrop').classList.add('active');
+      } else {
+        $('subscribeSheet').classList.remove('active');
+        $('sheetBackdrop').classList.remove('active');
+      }
+    }
+
+    function showToast(title, text) {
+      var stack = $('toastStack');
+      if (!stack) return;
+      clearTimeout(toastTimer);
+      stack.innerHTML = '';
+      var box = document.createElement('div');
+      box.className = 'toast';
+      var h = document.createElement('strong');
+      h.textContent = title;
+      var p = document.createElement('div');
+      p.textContent = text;
+      box.appendChild(h);
+      box.appendChild(p);
+      stack.appendChild(box);
+      toastTimer = setTimeout(function () {
+        stack.innerHTML = '';
+      }, 5500);
+    }
+
+    function membershipLabel() {
+      if (membershipMode === 'seven') return '七日方案：已解鎖七日內容';
+      if (membershipMode === 'month') return '月費會員：已解鎖結果與提醒';
+      return '免費版：僅可查看今日';
+    }
+
+    function updateMembershipUI() {
+      $('membershipTag').textContent = membershipLabel();
+    }
+
+    function reminderLabel() {
+      if (reminderMode === '15') return '提前 15 分鐘';
+      if (reminderMode === '5') return '提前 5 分鐘';
+      if (reminderMode === '0') return '開始當下';
+      if (reminderMode === 'off') return '已關閉';
+      return '提前 15 分鐘、提前 5 分鐘與開始當下';
+    }
+
+    function updateReminderUI() {
+      var isMonth = membershipMode === 'month';
+      var btns = document.querySelectorAll('[data-reminder-choice]');
+      for (var i = 0; i < btns.length; i++) {
+        var b = btns[i];
+        var choice = b.getAttribute('data-reminder-choice');
+        if (choice === reminderMode) b.classList.add('active');
+        else b.classList.remove('active');
+        b.disabled = !isMonth;
+      }
+      var status = $('reminderStatus');
+      if (!status) return;
+      if (!isMonth) {
+        status.textContent = '此功能為月費會員專屬；訂閱月費會員後，可選擇全部、提前 15 分鐘、提前 5 分鐘、準時提醒或關閉。';
+      } else if (reminderMode === 'off') {
+        status.textContent = '提醒功能已關閉。';
+      } else if (!birthConfirmed || birthDirty) {
+        status.textContent = '提醒暫停中：請先選擇出生資料並按「開始查看」，即可啟用今日時段提醒。';
+      } else {
+        status.textContent = '月費會員提醒目前設定為：' + reminderLabel() + '。當今日較值得留意的時段接近時，頁面會自動彈出提醒。';
+      }
+    }
+
+    function pauseForBirthEdit() {
+      birthDirty = true;
+      todayReminderResult = null;
+      if (reminderTimer) {
+        clearInterval(reminderTimer);
+        reminderTimer = null;
+      }
+      updateReminderUI();
+    }
+
+    function calculateForDate(b, y, m, d) {
+      var birthEight = getEightChar(b.by, b.bm, b.bd, b.bh, b.bmin);
+      var pillars = {
+        year: birthEight.getYear(),
+        month: birthEight.getMonth(),
+        day: birthEight.getDay(),
+        hour: birthEight.getTime()
+      };
+      var natalBranches = [
+        { name: '年柱', branch: pillars.year.charAt(1) },
+        { name: '月柱', branch: pillars.month.charAt(1) },
+        { name: '日柱', branch: pillars.day.charAt(1) },
+        { name: '時柱', branch: pillars.hour.charAt(1) }
+      ];
+      var dayMaster = pillars.day.charAt(0);
+      var wealth = getWealthStars(dayMaster);
+      var strength = analyzeStrength(pillars, dayMaster);
+      var plan = supportPlan(strength);
+      var observeEight = getEightChar(y, m, d, 12, 0);
+
+      var ranking = hourSlots.map(function (slot) {
+        var slotEight = getEightChar(y, m, d, slot.hour, slot.minute);
+        var r = scoreHourSlot(slotEight, observeEight, wealth, dayMaster, strength, plan, natalBranches);
+        return {
+          name: slot.name,
+          range: slot.range,
+          hour: slot.hour,
+          minute: slot.minute,
+          pillar: r.pillar,
+          score: r.score,
+          reasons: r.reasons
+        };
+      }).sort(function (a, b) {
+        return b.score - a.score;
+      });
+
+      return {
+        pillars: pillars,
+        plan: plan,
+        ranking: ranking
+      };
+    }
+
+    function renderMeta(result, y, m, d) {
+      $('metaPillars').textContent = result.pillars.year + '／' + result.pillars.month + '／' + result.pillars.day + '／' + result.pillars.hour;
+      $('metaObserve').textContent = y + '-' + pad(m) + '-' + pad(d);
+      var supportText = '較順：' + result.plan.good.join('、') + (result.plan.bad.length ? '｜避免：' + result.plan.bad.join('、') : '');
+      $('metaSupport').textContent = supportText;
+      return supportText;
+    }
+
+    function renderTopSlots(ranking) {
+      var host = $('topSlotsList');
+      host.innerHTML = '';
+      var top3 = ranking.slice(0, 3);
+      top3.forEach(function (item, idx) {
+        var card = document.createElement('article');
+        card.className = 'result-card';
+        card.innerHTML =
+          '<div class="result-top">' +
+            '<div>' +
+              '<div class="tag">今日首選 #' + (idx + 1) + '｜' + getLevelText(item.score) + '</div>' +
+              '<div class="time-slot">' + item.name + '（' + item.range + '）</div>' +
+              '<div class="subtext">時柱：' + item.pillar + '｜' + item.reasons.join('；') + '</div>' +
+            '</div>' +
+          '</div>';
+        host.appendChild(card);
+      });
+    }
+
+    function renderHourlyRanking(ranking) {
+      var host = $('hourlyRankingList');
+      host.innerHTML = '';
+      ranking.forEach(function (item, idx) {
+        var el = document.createElement('article');
+        el.className = 'rank-item';
+        el.innerHTML =
+          '<div class="rank-header">' +
+            '<div class="rank-no">第 ' + (idx + 1) + ' 名</div>' +
+            '<div class="rank-time">' + item.name + '｜' + item.range + '</div>' +
+            '<div class="rank-score">' + getLevelText(item.score) + '｜分數 ' + item.score + '</div>' +
+          '</div>' +
+          '<div class="subtext">時柱：' + item.pillar + '｜提示：' + item.reasons.join('、') + '</div>';
+        host.appendChild(el);
+      });
+    }
+
+    function renderSevenDays(b, startT, selectedT) {
+      var host = $('sevenDayList');
+      host.innerHTML = '';
+      for (var i = 0; i < 7; i++) {
+        var dt = new Date(startT.y, startT.m - 1, startT.d + i);
+        var y = dt.getFullYear(), m = dt.getMonth() + 1, d = dt.getDate();
+        var locked = membershipMode === 'free' && i > 0;
+        var isSelected = !locked && y === selectedT.y && m === selectedT.m && d === selectedT.d;
+        var card = document.createElement('article');
+        card.className = 'result-card' + (locked ? '' : ' clickable') + (isSelected ? ' selected-date' : '');
+
+        if (locked) {
+          card.innerHTML =
+            '<div class="result-top">' +
+              '<div>' +
+                '<div class="time-slot">' + y + '-' + pad(m) + '-' + pad(d) + '</div>' +
+                '<div class="subtext">升級七日方案或月費會員後，可直接點選查看此日最佳時段與完整 12 時段排序。</div>' +
+              '</div>' +
+              '<div class="tag">會員限定</div>' +
+            '</div>' +
+            '<div class="action-row"><button class="ghost-btn" type="button">查看解鎖方案</button></div>';
+          card.querySelector('button').addEventListener('click', function () {
+            toggleSheet(true);
+          });
+        } else {
+          var dayRes = calculateForDate(b, y, m, d);
+          var top = dayRes.ranking[0];
+          card.innerHTML =
+            '<div class="result-top">' +
+              '<div>' +
+                '<div class="time-slot">' + y + '-' + pad(m) + '-' + pad(d) + '</div>' +
+                '<div class="subtext">首選時段：' + top.name + '（' + top.range + '）｜' + top.reasons[0] + '</div>' +
+              '</div>' +
+              '<div class="tag">' + (isSelected ? '目前查看中' : getLevelText(top.score)) + '</div>' +
+            '</div>';
+          (function (cy, cm, cd) {
+            card.addEventListener('click', function () {
+              setObserveDate(cy, cm, cd);
+              runCalculation(false);
+            });
+          })(y, m, d);
+        }
+        host.appendChild(card);
+      }
+    }
+
+    function reminderOffsets() {
+      if (reminderMode === '15') return [15];
+      if (reminderMode === '5') return [5];
+      if (reminderMode === '0') return [0];
+      if (reminderMode === 'off') return [];
+      return [15, 5, 0];
+    }
+
+    function checkMemberReminders() {
+      if (document.hidden || membershipMode !== 'month' || reminderMode === 'off' || !birthConfirmed || birthDirty || !confirmedBirth) {
+        return;
+      }
+      var t = todayParts();
+      var dayStr = dateKey(t);
+      if (!todayReminderResult || todayReminderResult.day !== dayStr) {
+        var res = calculateForDate(confirmedBirth, t.y, t.m, t.d);
+        todayReminderResult = { day: dayStr, ranking: res.ranking };
+      }
+      if (sentDay !== dayStr) {
+        sentDay = dayStr;
+        sentKeys = {};
+        try {
+          var saved = JSON.parse(readStored('memberReminderSent', '{}'));
+          if (saved && saved.day === dayStr && Array.isArray(saved.keys)) {
+            saved.keys.forEach(function (k) { sentKeys[k] = true; });
+          }
+        } catch (e) {}
+      }
+
+      var now = new Date();
+      var dueMessages = [];
+      var hotSlots = todayReminderResult.ranking.filter(function (item, idx) {
+        return idx < 3 || item.score >= 8;
+      });
+
+      hotSlots.forEach(function (item) {
+        var startDt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), item.hour, 0, 0, 0);
+        if (item.hour === 23 && now.getHours() < 12) {
+          startDt.setDate(startDt.getDate() - 1);
+        }
+        reminderOffsets().forEach(function (offset) {
+          var triggerTime = startDt.getTime() - offset * 60000;
+          var diffMs = now.getTime() - triggerTime;
+          var key = dayStr + '|' + item.range + '|' + offset;
+          if (diffMs >= 0 && diffMs < 60000 && !sentKeys[key]) {
+            sentKeys[key] = true;
+            var lead = offset === 0 ? '現在開始' : '約 ' + offset + ' 分鐘後開始';
+            dueMessages.push(item.name + '（' + item.range + '）：' + lead + '。' + (item.reasons[0] || ''));
+          }
+        });
+      });
+
+      if (dueMessages.length) {
+        writeStored('memberReminderSent', JSON.stringify({ day: dayStr, keys: Object.keys(sentKeys) }));
+        showToast('會員時段提醒', dueMessages.join('\n'));
+      }
+    }
+
+    function configureReminderTimer() {
+      if (reminderTimer) {
+        clearInterval(reminderTimer);
+        reminderTimer = null;
+      }
+      if (membershipMode === 'month' && reminderMode !== 'off' && birthConfirmed && !birthDirty && !document.hidden) {
+        checkMemberReminders();
+        reminderTimer = setInterval(function () {
+          checkMemberReminders();
+          updateReminderUI();
+        }, 10000);
+      }
+    }
+
+    // 雙重檢查七日方案是否已滿 7 天，若已滿則自動斷開並回復為免費版（僅可查看即日）
+    function enforceSevenDayExpiryGuard() {
+      var plan = readStored('membershipPlan', 'free');
+      if (plan === 'seven_day') {
+        var now = Date.now();
+        var updatedAt = Number(readStored('membershipUpdatedAt', '0'));
+        var trackedStart = Number(readStored('sevenDayTrackedStart', '0'));
+        if (!trackedStart || isNaN(trackedStart)) {
+          trackedStart = updatedAt > 0 ? updatedAt : now;
+          writeStored('sevenDayTrackedStart', String(trackedStart));
+        }
+        if (now - trackedStart >= SEVEN_DAYS_MS) {
+          writeStored('membershipPlan', 'free');
+          removeStored('sevenDayTrackedStart');
+          membershipMode = 'free';
+          setObserveDateToToday();
+          updateMembershipUI();
+          updateReminderUI();
+          return 'free';
+        }
+      } else {
+        removeStored('sevenDayTrackedStart');
+      }
+      return plan;
+    }
+
+    function runCalculation(confirmInput) {
+      try {
+        enforceSevenDayExpiryGuard();
+
+        if (confirmInput) {
+          var inputBirth = getBirthInput();
+          if (!validBirth(inputBirth)) {
+            $('engineStatus').textContent = '請先完整選擇有效的出生年月日、時間與性別。';
+            showToast('資料未完整', '請先選擇出生年月日、出生時分與性別，再按「開始查看」。');
+            return;
+          }
+          confirmedBirth = inputBirth;
+          birthConfirmed = true;
+          birthDirty = false;
+          todayReminderResult = null;
+        }
+
+        if (!birthConfirmed || birthDirty || !confirmedBirth) {
+          $('engineStatus').textContent = '請選擇出生資料並按「開始查看」。';
+          updateReminderUI();
+          return;
+        }
+
+        var oy = Number($('observeYear').value);
+        var om = Number($('observeMonth').value);
+        var od = Number($('observeDay').value);
+        if (!validDate(oy, om, od) || oy < OBSERVE_YEAR_MIN || oy > OBSERVE_YEAR_MAX) {
+          setObserveDateToToday();
+          var tNow = todayParts();
+          oy = tNow.y; om = tNow.m; od = tNow.d;
+        }
+
+        var today = todayParts();
+        var diffDays = Math.round((new Date(oy, om - 1, od) - new Date(today.y, today.m - 1, today.d)) / 86400000);
+        var blockedFree = membershipMode === 'free' && (oy !== today.y || om !== today.m || od !== today.d);
+        var blockedSeven = membershipMode === 'seven' && (diffDays < 0 || diffDays > 6);
+        var blocked = blockedFree || blockedSeven;
+
+        var target = blocked ? today : { y: oy, m: om, d: od };
+        var res = calculateForDate(confirmedBirth, target.y, target.m, target.d);
+        var top = res.ranking[0];
+        var userName = ($('nameInput').value || '').trim() || '您';
+
+        renderMeta(res, target.y, target.m, target.d);
+        renderHourlyRanking(res.ranking);
+
+        if (blocked) {
+          $('heroTime').textContent = membershipMode === 'free' ? '會員限定' : '超出七日範圍';
+          $('heroLead').textContent = oy + '-' + pad(om) + '-' + pad(od) + ' 不在目前方案可查看範圍；下方為您顯示今日結果摘要。';
+          $('engineStatus').textContent = membershipMode === 'free'
+            ? '免費版（或七日方案到期後）僅可查看今日結果；如需查看其他日期，請升級七日方案或月費會員。'
+            : '七日方案可查看今日起計連續七日內容；如需查看任意日期，請升級月費會員。';
+          $('topSlotsList').innerHTML =
+            '<article class="result-card">' +
+              '<div class="time-slot">所選日期未開放</div>' +
+              '<div class="subtext">下方完整排序與七日列表已自動為您切換回今日（即日）內容。</div>' +
+              '<div class="action-row"><button class="primary-btn" id="unlockDateBtn" type="button">查看會員方案</button></div>' +
+            '</article>';
+          $('unlockDateBtn').addEventListener('click', function () {
+            toggleSheet(true);
+          });
+        } else {
+          $('heroTime').textContent = top.range;
+          $('heroLead').textContent = userName + '於 ' + target.y + '-' + pad(target.m) + '-' + pad(target.d) + ' 的首選時段為' + top.name + '，評語為「' + getLevelText(top.score) + '」。';
+          $('engineStatus').textContent = membershipMode === 'month'
+            ? '已完成分析計算；目前為月費會員，所有日期與時段提醒均已解鎖。'
+            : membershipMode === 'seven'
+              ? '已完成分析計算；目前為七日方案，可查看今日起計連續七日內容。'
+              : '已完成分析計算；目前顯示今日（即日）結果。';
+          renderTopSlots(res.ranking);
+        }
+
+        var startWindow = (membershipMode === 'month' && !blocked) ? target : today;
+        renderSevenDays(confirmedBirth, startWindow, target);
+        updateMembershipUI();
+        updateReminderUI();
+        configureReminderTimer();
+      } catch (err) {
+        $('engineStatus').textContent = '計算時發生問題，請重新確認出生資料。';
+      }
+    }
+
+    function syncMembershipFromAndroid() {
+      var plan = enforceSevenDayExpiryGuard();
+      membershipMode = plan === 'monthly' ? 'month' : plan === 'seven_day' ? 'seven' : 'free';
+      updateMembershipUI();
+      if (membershipMode === 'free') {
+        setObserveDateToToday();
+      }
+      if (birthConfirmed && !birthDirty && confirmedBirth) {
+        runCalculation(false);
+      }
+      updateReminderUI();
+      configureReminderTimer();
+    }
+
+    // 每 60 秒自動巡檢一次七日方案是否到期，若在開啟期間滿 7 日即自動鎖回即日
+    setInterval(function () {
+      if (membershipMode === 'seven') {
+        var planAfterCheck = enforceSevenDayExpiryGuard();
+        if (planAfterCheck === 'free' && birthConfirmed && !birthDirty && confirmedBirth) {
+          runCalculation(false);
+        }
+      }
+    }, 60000);
+
+    function setTheme(theme) {
+      var val = theme === 'dark' ? 'dark' : 'light';
+      root.setAttribute('data-theme', val);
+      writeStored('themeChoice', val);
+      var btns = document.querySelectorAll('[data-theme-choice]');
+      for (var i = 0; i < btns.length; i++) {
+        if (btns[i].getAttribute('data-theme-choice') === val) btns[i].classList.add('active');
+        else btns[i].classList.remove('active');
+      }
+    }
+
+    function setScale(scale) {
+      var val = ['small', 'medium', 'large'].indexOf(scale) !== -1 ? scale : 'medium';
+      root.setAttribute('data-scale', val);
+      writeStored('scaleChoice', val);
+      var btns = document.querySelectorAll('[data-scale-choice]');
+      for (var i = 0; i < btns.length; i++) {
+        if (btns[i].getAttribute('data-scale-choice') === val) btns[i].classList.add('active');
+        else btns[i].classList.remove('active');
+      }
+    }
+
+    function bindEvents() {
+      var views = {
+        today: ['view-today', 'heroToday'],
+        plans: ['view-plans', 'heroPlans'],
+        settings: ['view-settings', 'heroSettings']
+      };
+      var segBtns = document.querySelectorAll('.segment button');
+      for (var i = 0; i < segBtns.length; i++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            for (var j = 0; j < segBtns.length; j++) segBtns[j].classList.remove('active');
+            btn.classList.add('active');
+            Object.keys(views).forEach(function (k) {
+              views[k].forEach(function (id) { $(id).classList.remove('active'); });
+            });
+            var v = btn.getAttribute('data-view');
+            (views[v] || []).forEach(function (id) { $(id).classList.add('active'); });
+          });
+        })(segBtns[i]);
+      }
+
+      var themeBtns = document.querySelectorAll('[data-theme-choice]');
+      for (var t = 0; t < themeBtns.length; t++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            setTheme(btn.getAttribute('data-theme-choice'));
+          });
+        })(themeBtns[t]);
+      }
+
+      var scaleBtns = document.querySelectorAll('[data-scale-choice]');
+      for (var s = 0; s < scaleBtns.length; s++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            setScale(btn.getAttribute('data-scale-choice'));
+          });
+        })(scaleBtns[s]);
+      }
+
+      var remBtns = document.querySelectorAll('[data-reminder-choice]');
+      for (var r = 0; r < remBtns.length; r++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            if (membershipMode !== 'month') return;
+            reminderMode = btn.getAttribute('data-reminder-choice');
+            writeStored('reminderMode', reminderMode);
+            updateReminderUI();
+            configureReminderTimer();
+          });
+        })(remBtns[r]);
+      }
+
+      var pickBtns = document.querySelectorAll('[data-picker-target]');
+      for (var p = 0; p < pickBtns.length; p++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            openPicker(btn.getAttribute('data-picker-target'));
+          });
+        })(pickBtns[p]);
+      }
+
+      $('pickerCancelBtn').addEventListener('click', closePicker);
+      $('pickerDoneBtn').addEventListener('click', applyPicker);
+      $('pickerBackdrop').addEventListener('click', closePicker);
+      $('pickerOptions').addEventListener('scroll', function () {
+        setWheelActive();
+        clearTimeout(wheelScrollTimer);
+        wheelScrollTimer = setTimeout(function () {
+          if (pickerState) snapWheelToValue(pickerState.value);
+        }, 90);
+      });
+
+      var openSheetBtns = document.querySelectorAll('[data-open-sheet]');
+      for (var o = 0; o < openSheetBtns.length; o++) {
+        openSheetBtns[o].addEventListener('click', function () {
+          toggleSheet(true);
+        });
+      }
+      $('closeSheet').addEventListener('click', function () { toggleSheet(false); });
+      $('sheetBackdrop').addEventListener('click', function () { toggleSheet(false); });
+
+      function postIosBilling(action) {
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iosBilling) {
+          window.webkit.messageHandlers.iosBilling.postMessage({ action: action });
+          return true;
+        }
+        return false;
+      }
+
+      $('confirmSevenDayPurchase').addEventListener('click', function () {
+        toggleSheet(false);
+        if (postIosBilling('buySevenDay')) return;
+        if (window.AndroidBilling && typeof window.AndroidBilling.buySevenDay === 'function') {
+          window.AndroidBilling.buySevenDay();
+        } else {
+          showToast('付款未開啟', '請在已登入 App Store 的 iOS 裝置上進行購買。');
+        }
+      });
+
+      $('confirmMonthlyPurchase').addEventListener('click', function () {
+        toggleSheet(false);
+        if (postIosBilling('buyMonthly')) return;
+        if (window.AndroidBilling && typeof window.AndroidBilling.buyMonthly === 'function') {
+          window.AndroidBilling.buyMonthly();
+        } else {
+          showToast('付款未開啟', '請在已登入 App Store 的 iOS 裝置上進行購買。');
+        }
+      });
+
+      function triggerRestore() {
+        toggleSheet(false);
+        if (!postIosBilling('restore')) {
+          showToast('恢復購買', '請在已登入 App Store 的 iOS 裝置上使用此功能。');
+        }
+      }
+      if ($('restorePurchasesBtn')) $('restorePurchasesBtn').addEventListener('click', triggerRestore);
+      if ($('restoreSheetBtn')) $('restoreSheetBtn').addEventListener('click', triggerRestore);
+
+      window.applyIosPrices = function (sevenPrice, monthPrice) {
+        if (sevenPrice && $('sevenDayPrice')) $('sevenDayPrice').textContent = sevenPrice;
+        if (monthPrice && $('monthlyPrice')) $('monthlyPrice').textContent = monthPrice;
+      };
+
+      window.notifyIosToast = function (title, msg) {
+        showToast(title, msg);
+      };
+
+      $('calcBtn').addEventListener('click', function () {
+        runCalculation(true);
+      });
+
+      $('resetBtn').addEventListener('click', function () {
+        clearBirthFieldsToEmpty();
+      });
+
+      window.addEventListener('membershipChanged', syncMembershipFromAndroid);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+          syncMembershipFromAndroid();
+        } else {
+          configureReminderTimer();
+        }
+      });
+    }
+
+    function initialize() {
+      fillSelect('birthYear', BIRTH_YEAR_MIN, BIRTH_YEAR_MAX, '年', false);
+      fillSelect('birthMonth', 1, 12, '月', false);
+      fillSelect('birthDay', 1, 31, '日', false);
+      fillSelect('birthHour', 0, 23, '時', true);
+      fillSelect('birthMinute', 0, 59, '分', true);
+
+      var genderSel = $('gender');
+      genderSel.innerHTML = '';
+      var gEmpty = document.createElement('option');
+      gEmpty.value = '';
+      gEmpty.textContent = '請選擇';
+      var gM = document.createElement('option');
+      gM.value = '男';
+      gM.textContent = '男';
+      var gF = document.createElement('option');
+      gF.value = '女';
+      gF.textContent = '女';
+      genderSel.appendChild(gEmpty);
+      genderSel.appendChild(gM);
+      genderSel.appendChild(gF);
+
+      fillSelect('observeYear', OBSERVE_YEAR_MIN, OBSERVE_YEAR_MAX, '年', false);
+      fillSelect('observeMonth', 1, 12, '月', false);
+      fillSelect('observeDay', 1, 31, '日', false);
+
+      setTheme(readStored('themeChoice', 'light'));
+      setScale(readStored('scaleChoice', 'medium'));
+
+      // 啟動時一律清空出生資料及舊記錄，確保每次開 App 查詢均為空白（「請選擇」），絕不預設顯示 1979-12-08
+      clearBirthFieldsToEmpty();
+      bindEvents();
+      syncMembershipFromAndroid();
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iosBilling) {
+        window.webkit.messageHandlers.iosBilling.postMessage({ action: 'init' });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+      initialize();
+    }
+  })();
+</script>
+</body>
+</html>
