@@ -6,14 +6,18 @@ workflows:
     integrations:
       app_store_connect: AppStoreConnectKey
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.piancaishike.ios
       vars:
         XCODE_PROJECT: "PianCaiShiKe.xcodeproj"
         XCODE_SCHEME: "PianCaiShiKe"
         BUNDLE_ID: "com.piancaishike.ios"
     scripts:
+      - name: Initialize keychain & auto-create signing files
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
       - name: Organize project folder structure
         script: |
           mkdir -p PianCaiShiKe/Resources PianCaiShiKe/Assets.xcassets/AppIcon.appiconset PianCaiShiKe/Assets.xcassets/AccentColor.colorset
@@ -40,7 +44,9 @@ workflows:
           xcode-project use-profiles
       - name: Build ipa for distribution
         script: |
-          xcode-project build-ipa             --project "$XCODE_PROJECT"             --scheme "$XCODE_SCHEME"
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
